@@ -1,48 +1,77 @@
 #include <iostream>
-#include <vector>
 #include <unordered_map>
+#include <list>
+#include <string>
+#include <vector>
 
 using namespace std;
 
-class Person {
+class Graph {
+private:
+    unordered_map<string, list<string>> adjList;  // Graph's adjacency list
+    unordered_map<string, string> decisions;  // Map to store decisions (Guilty/NotGuilty)
+
 public:
-    string name;
-    string decision;
-
-    Person(const string& name, const string& decision) : name(name), decision(decision) {}
-};
-
-string findMajorityDecision(const vector<Person>& people) {
-    int guiltyCount = 0;
-    int notGuiltyCount = 0;
-
-    for (const auto& person : people) {
-        if (person.decision == "Guilty") {
-            guiltyCount++;
-        } else if (person.decision == "NotGuilty") {
-            notGuiltyCount++;
+    // Add a vertex (person) to the graph
+    void addVertex(const string& vertex) {
+        if (adjList.find(vertex) == adjList.end()) {
+            adjList[vertex] = list<string>();
         }
     }
 
-    if (guiltyCount >= notGuiltyCount) {
-        return "Guilty";
-    } else if (notGuiltyCount > guiltyCount) {
-        return "NotGuilty";
+    // Add an edge between two vertices (decisions)
+    void addEdge(const string& vertex1, const string& vertex2) {
+        adjList[vertex1].push_back(vertex2);
     }
-}
+
+    // Store the decision for a person (vertex)
+    void addDecision(const string& person, const string& decision) {
+        decisions[person] = decision;
+    }
+
+    // Find majority decision based on votes
+    string findMajorityDecision() {
+        int guiltyCount = 0;
+        int notGuiltyCount = 0;
+
+        // Traverse all people and count the votes
+        for (const auto& entry : decisions) {
+            if (entry.second == "Guilty") {
+                guiltyCount++;
+            } else if (entry.second == "NotGuilty") {
+                notGuiltyCount++;
+            }
+        }
+
+        if (guiltyCount >= notGuiltyCount) {
+            return "Guilty";
+        } else {
+            return "NotGuilty";
+        }
+    }
+};
 
 int main() {
-    vector<Person> people = {
-        Person("Judge", "Guilty")
-        Person("Alice", "Guilty"),
-        Person("Bob", "NotGuilty"),
-        Person("Charlie", "Guilty"),
-        Person("David", "NotGuilty"),
-        Person("Eve", "Guilty")
-    };
+    Graph g;
 
-    string majorityDecision = findMajorityDecision(people);
+    // Adding people (vertices) to the graph
+    g.addVertex("Judge");
+    g.addVertex("Alice");
+    g.addVertex("Bob");
+    g.addVertex("Charlie");
+    g.addVertex("David");
+    g.addVertex("Eve");
 
+    // Adding decisions (edges)
+    g.addDecision("Judge", "Guilty");
+    g.addDecision("Alice", "Guilty");
+    g.addDecision("Bob", "NotGuilty");
+    g.addDecision("Charlie", "Guilty");
+    g.addDecision("David", "NotGuilty");
+    g.addDecision("Eve", "Guilty");
+
+    // Find the majority decision
+    string majorityDecision = g.findMajorityDecision();
     cout << "The majority decision is: " << majorityDecision << endl;
 
     return 0;
